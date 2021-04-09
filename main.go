@@ -9,11 +9,11 @@ package main
 */
 
 import (
-	"flag"
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"os"
-
 	"github.com/fabpot/local-php-security-checker/security"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -21,61 +21,37 @@ var (
 	date    = "unknown"
 )
 
-func main() {
-	format := flag.String("format", "ansi", "Output format (ansi, markdown, json, or yaml)")
-	path := flag.String("path", "", "composer.lock file or directory")
-	advisoryArchiveURL := flag.String("archive", security.AdvisoryArchiveURL, "Advisory archive URL")
-	local := flag.Bool("local", false, "Do not make HTTP calls (needs a valid cache file)")
-	updateCacheOnly := flag.Bool("update-cache", false, "Update the cache (other flags are ignored)")
-	help := flag.Bool("help", false, "Output help and version")
-	flag.Parse()
-
-	if *help {
-		fmt.Printf("Local PHP Security Checker %s, built at %s\n", version, date)
-		os.Exit(0)
-	}
-
-	db, err := security.NewDB(*local, *advisoryArchiveURL)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to load the advisory DB: %s\n", err)
-		os.Exit(127)
-	}
-
-	if *updateCacheOnly {
-		if err := db.Load(*advisoryArchiveURL); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(127)
-		}
-		return
-	}
-
-	if *format != "" && *format != "markdown" && *format != "json" && *format != "yaml" && *format != "ansi" {
-		fmt.Fprintf(os.Stderr, "format \"%s\" is not supported (supported formats: markdown, ansi, json, and yaml)\n", *format)
-		os.Exit(2)
-	}
-
-	lockReader, err := security.LocateLock(*path)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(127)
-	}
-
-	lock, err := security.NewLock(lockReader)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to load the lock file: %s\n", err)
-		os.Exit(127)
-	}
-
-	vulns := security.Analyze(lock, db)
-
-	output, err := security.Format(vulns, *format)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to output the results: %s\n", err)
-		os.Exit(127)
-	}
-	fmt.Printf(string(output))
-
-	if vulns.Count() > 0 {
-		os.Exit(1)
-	}
+type SecurityResponse struct {
+	PackageName string `json:"package_name"`
+	Vulnerabilities[] *security.Vulnerability `json:"vulnerabilities"`
 }
+
+func main() {
+
+	app := fiber.New()
+	db, _ := security.NewDB(false, security.AdvisoryArchiveURL)
+
+	app.Post("/api/v1/check", func(c *fiber.Ctx) error {
+		composer := c.Body()
+		if !json.Valid(composer) {
+			c.Status(400)
+			return c.JSON("Bad request")
+		}
+		lockReader := bytes.NewReader(composer)
+		lock, _ := security.NewLock(lockReader)
+		vulns := security.Analyze(lock, db)
+		var responses []SecurityResponse
+		item := SecurityResponse{}
+		for _, pkg := range vulns.Keys() {
+			fmt.Print(pkg)
+			v := vulns.Get(pkg)
+			item.PackageName = pkg
+			item.Vulnerabilities = append(item.Vulnerabilities, v)
+			responses = append(responses, item)
+		}
+		return c.JSON(responses)
+	})
+	app.Listen(":3000")
+}
+
+
