@@ -29,7 +29,7 @@ type SecurityResponse struct {
 func main() {
 
 	app := fiber.New()
-	db, _ := security.NewDB(false, security.AdvisoryArchiveURL)
+	db, _ := security.NewDB(false)
 
 	app.Post("/api/v1/check", func(c *fiber.Ctx) error {
 		composer := c.Body()
