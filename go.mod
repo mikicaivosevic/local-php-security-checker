@@ -3,8 +3,9 @@ module github.com/mikicaivosevic/local-php-security-checker
 go 1.14
 
 require (
-	github.com/fabpot/local-php-security-checker v1.0.0 // indirect
-	github.com/gofiber/fiber/v2 v2.7.1 // indirect
+	github.com/fabpot/local-php-security-checker v1.0.0
+	github.com/gofiber/fiber/v2 v2.7.1
+	github.com/gofiber/template v1.6.8
 	github.com/hashicorp/go-version v1.2.1
 	github.com/klauspost/compress v1.11.13 // indirect
 	github.com/mitchellh/go-homedir v1.1.0

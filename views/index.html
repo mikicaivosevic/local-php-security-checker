@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.82.0">
+    <title>PHP Security Checker</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/sticky-footer/">
+
+
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <meta name="theme-color" content="#7952b3">
+
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+        .container {
+            width: auto;
+            max-width: 680px;
+            padding: 0 15px;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column h-100">
+
+<!-- Begin page content -->
+<main class="flex-shrink-0">
+    <div class="container">
+        <h1 class="mt-5">PHP Security Checker</h1>
+        <p class="lead">PHP Security Checker is a tool that checks if your PHP application
+            depends on PHP packages with known security vulnerabilities. It uses the <a href="https://github.com/FriendsOfPHP/security-advisories">Security Advisories Database</a> behind the scenes.</p>
+        <br>
+        <br>
+        <p>How to use ?</p>
+        <code>curl --data "@composer.lock" http://php-security.abstract.rs/api/v1/check</code>
+        <br>
+        <br>
+        <br>
+        <p>API response (example) </p>
+        <pre>{
+   "data":[
+      {
+         "package_name":"laravel/framework",
+         "vulnerabilities":[
+            {
+               "version":"v7.30.1",
+               "advisories":[
+                  {
+                     "title":"Unexpected bindings in QueryBuilder",
+                     "link":"https://github.com/laravel/framework/security/advisories/GHSA-x7p5-p2c9-phvg",
+                     "cve":""
+                  },
+                  {
+                     "title":"Unexpected bindings in QueryBuilder",
+                     "link":"https://blog.laravel.com/security-laravel-62011-7302-8221-released",
+                     "cve":"CVE-2021-21263"
+                  }
+               ]
+            }
+         ]
+      }
+   ]
+}</pre>
+
+    </div>
+</main>
+
+<footer class="footer mt-auto py-3 bg-light">
+    <div class="container">
+        <span class="text-muted">Forked from <a href="https://github.com/fabpot/local-php-security-checker">fabpot/local-php-security-checker</a></span>
+    </div>
+</footer>
+
+
+
+</body>
+</html>
