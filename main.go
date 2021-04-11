@@ -38,7 +38,11 @@ func apiSecurityHandler(db *security.AdvisoryDB) fiber.Handler {
 			return c.JSON("Bad request")
 		}
 		lockReader := bytes.NewReader(composer)
-		lock, _ := security.NewLock(lockReader)
+		lock, err := security.NewLock(lockReader)
+		if err != nil {
+			c.Status(400)
+			return c.JSON("Bad request")
+		}
 		vulns := security.Analyze(lock, db)
 		var response ApiResponse
 		item := PackageResponse{}
